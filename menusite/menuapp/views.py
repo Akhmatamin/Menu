@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics
 from rest_framework.generics import ListAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .serializers import *
 from .models import *
@@ -46,4 +48,30 @@ class CartItemViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+class CartAPIView(APIView):
+    def get(self, request):
+        if request.user.is_anonymous:
+            return Response({"error": "login required"}, status=401)
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        items = CartItem.objects.filter(cart=cart)
+
+        return Response({
+            "items": CartItemSerializer(items, many=True).data,
+            "total": cart.get_final_price()
+        })
+
+    def post(self, request):
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        product = Product.objects.get(id=request.data["product_id"])
+        item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+
+        if "quantity" in request.data:
+            item.quantity = int(request.data["quantity"])
+        else:
+            item.quantity += 1
+
+        item.save()
+
+        return Response({"message": "ok", "qty": item.quantity})
 

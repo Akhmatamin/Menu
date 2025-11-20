@@ -9,15 +9,35 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
+    avg_rating = serializers.FloatField(source="get_avg_rating", read_only=True)
+    reviews_count = serializers.IntegerField(source="get_count_user", read_only=True)
     class Meta:
         model = Product
-        fields = ['id','product_name','product_image','product_price']
-
+        fields = [
+            'id',
+            'product_name',
+            'product_image',
+            'product_price',
+            'avg_rating',
+            'reviews_count',
+        ]
 
 class ProductDetailSerializer(serializers.ModelSerializer):
+    avg_rating = serializers.FloatField(source="get_avg_rating", read_only=True)
+    reviews_count = serializers.IntegerField(source="get_count_user", read_only=True)
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = [
+            'id',
+            'product_name',
+            'product_description',
+            'product_image',
+            'product_price',
+            'avg_rating',
+            'reviews_count',
+            'product_category',
+            'size'
+        ]
 
 
 class CategoryListSerializer(serializers.ModelSerializer):
@@ -27,10 +47,10 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
-    products = ProductListSerializer(many=True, read_only=True)
+    products = ProductListSerializer(source='product_category', many=True,read_only=True)
     class Meta:
         model = Category
-        fields = ['id','category_name','category_description','products']
+        fields = ['id', 'category_name', 'category_description', 'products']
 
 class ReviewListSerializer(serializers.ModelSerializer):
     class Meta:

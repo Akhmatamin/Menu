@@ -4,7 +4,6 @@ from rest_framework import routers
 
 router = routers.SimpleRouter()
 router.register(r'user',UserProfileViewSet, basename='users')
-router.register(r'cart',CartViewSet, basename='cart')
 router.register(r'cartitem',CartItemViewSet, basename='cartitems')
 router.register(r'order',OrderViewSet, basename='order')
 
@@ -16,5 +15,6 @@ urlpatterns = [
     path('category/<int:pk>',CategoryDetailAPIView.as_view(), name='category-detail'),
     path('review',ReviewListAPIView.as_view(), name='review-list'),
     path('review/<int:pk>',ReviewDetailAPIView.as_view(), name='review-detail'),
+    path('cart/simple/', CartAPIView.as_view())
 
 ]

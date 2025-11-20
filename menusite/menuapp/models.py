@@ -21,6 +21,13 @@ class Product(models.Model):
     product_description = models.TextField()
     product_image = models.ImageField(upload_to="productImages/")
     product_price = models.FloatField()
+    product_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="product_category")
+    SIZE_CHOICES = (
+        ('Small', 'Small'),
+        ('Half', 'Half'),
+        ('Full', 'Full'),
+    )
+    size = models.CharField(max_length=20, choices=SIZE_CHOICES, default='Full')
 
     def get_avg_rating(self):
         reviews = self.reviews.all()
@@ -43,6 +50,9 @@ class Review(models.Model):
     rating = models.PositiveIntegerField(choices=[(i, str(i)) for i in range(1,6)])
     comment = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} reviewed {self.product.product_name}"
 
 class Cart(models.Model):
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
